@@ -1,0 +1,329 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{geometry}
+\usepackage{forest}
+\usepackage{booktabs}
+\usepackage{hyperref}
+
+\geometry{margin=1in}
+
+\title{\textbf{Statistical Concepts for Machine Learning}}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Correlation}
+
+\subsection{Mathematical Definition}
+Correlation measures the \textbf{linear relationship} between two variables, ranging from $-1$ to $+1$.
+
+\textbf{Pearson Correlation Coefficient:}
+\begin{equation}
+r = \frac{\text{Cov}(X,Y)}{\sigma_X \times \sigma_Y}
+\end{equation}
+
+Where:
+\begin{itemize}
+    \item $\text{Cov}(X,Y)$ = covariance between $X$ and $Y$
+    \item $\sigma_X$, $\sigma_Y$ = standard deviations of $X$ and $Y$
+\end{itemize}
+
+\textbf{Alternative formula:}
+\begin{equation}
+r = \frac{\sum_{i=1}^{n}[(x_i - \bar{x})(y_i - \bar{y})]}{\sqrt{\sum_{i=1}^{n}(x_i - \bar{x})^2 \times \sum_{i=1}^{n}(y_i - \bar{y})^2}}
+\end{equation}
+
+Where:
+\begin{itemize}
+    \item $x_i$ = individual values of variable $X$
+    \item $y_i$ = individual values of variable $Y$
+    \item $\bar{x}$ = mean of $X$
+    \item $\bar{y}$ = mean of $Y$
+    \item $n$ = number of observations
+\end{itemize}
+
+\subsection{Interpretation}
+\begin{itemize}
+    \item $r = +1$: Perfect positive linear relationship
+    \item $r = -1$: Perfect negative linear relationship
+    \item $r = 0$: No linear relationship (but nonlinear relationships may exist!)
+    \item $|r| > 0.7$: Strong correlation
+    \item $0.3 < |r| < 0.7$: Moderate correlation
+    \item $|r| < 0.3$: Weak correlation
+\end{itemize}
+
+\subsection{Key Insights}
+\begin{itemize}
+    \item Correlation $\neq$ Causation (classic mistake!)
+    \item Only captures \textbf{linear} relationships
+    \item Sensitive to outliers
+    \item Dimensionless (unlike covariance)
+\end{itemize}
+
+\section{Covariance}
+
+\subsection{Mathematical Definition}
+Covariance measures how two variables \textbf{change together}.
+
+\begin{equation}
+\text{Cov}(X,Y) = E[(X - \mu_X)(Y - \mu_Y)]
+\end{equation}
+
+Where:
+\begin{itemize}
+    \item $E[\cdot]$ = expected value (mean)
+    \item $\mu_X$ = mean of $X$
+    \item $\mu_Y$ = mean of $Y$
+\end{itemize}
+
+\textbf{Sample covariance:}
+\begin{equation}
+\text{Cov}(X,Y) = \frac{\sum_{i=1}^{n}[(x_i - \bar{x})(y_i - \bar{y})]}{n - 1}
+\end{equation}
+
+Where:
+\begin{itemize}
+    \item $x_i$, $y_i$ = individual observations
+    \item $\bar{x}$, $\bar{y}$ = sample means
+    \item $n$ = sample size
+\end{itemize}
+
+\subsection{Interpretation}
+\begin{itemize}
+    \item $\text{Cov}(X,Y) > 0$: $X$ and $Y$ tend to increase together
+    \item $\text{Cov}(X,Y) < 0$: When $X$ increases, $Y$ tends to decrease
+    \item $\text{Cov}(X,Y) = 0$: No linear relationship
+\end{itemize}
+
+\subsection{Key Insights}
+\begin{itemize}
+    \item Has units (product of $X$ and $Y$ units)
+    \item Magnitude depends on variable scales
+    \item Used in PCA, portfolio theory, multivariate analysis
+    \item \textbf{Covariance Matrix}: Extends to multiple variables
+\end{itemize}
+
+\begin{equation}
+\Sigma = \begin{bmatrix}
+\text{Cov}(X_1,X_1) & \text{Cov}(X_1,X_2) \\
+\text{Cov}(X_2,X_1) & \text{Cov}(X_2,X_2)
+\end{bmatrix}
+\end{equation}
+
+Diagonal = variances, off-diagonal = covariances
+
+\subsection{Relationship Between Covariance and Correlation}
+\begin{equation}
+\text{Correlation} = \text{Normalized Covariance}
+\end{equation}
+\begin{equation}
+r = \frac{\text{Cov}(X,Y)}{\sigma_X \times \sigma_Y}
+\end{equation}
+
+\section{Overfitting Detection and Prevention}
+
+\subsection{What is Overfitting?}
+Model learns \textbf{noise} in training data rather than the underlying pattern. Performs well on training data but poorly on new data.
+
+\subsection{Detection Methods}
+
+\textbf{1. Training vs Validation Performance Gap}
+\begin{equation}
+\text{If: Training\_Error} \ll \text{Validation\_Error} \implies \text{Likely overfitting}
+\end{equation}
+
+\textbf{2. Learning Curves}
+\begin{itemize}
+    \item Plot error vs training size
+    \item Overfitting: large gap between train/validation curves
+    \item Underfitting: both errors high and close together
+\end{itemize}
+
+\textbf{3. Cross-Validation Scores}
+\begin{itemize}
+    \item High variance in CV scores $\rightarrow$ overfitting
+    \item Use k-fold cross-validation to check consistency
+\end{itemize}
+
+\subsection{Prevention Strategies}
+
+\textbf{1. Regularization}
+\begin{itemize}
+    \item \textbf{L1 (Lasso)}: $\text{Cost} = \text{MSE} + \lambda\sum|w_i|$ $\rightarrow$ Sparse models
+    \item \textbf{L2 (Ridge)}: $\text{Cost} = \text{MSE} + \lambda\sum w_i^2$ $\rightarrow$ Shrinks weights
+    \item \textbf{Elastic Net}: Combines L1 + L2
+\end{itemize}
+
+Where:
+\begin{itemize}
+    \item $w_i$ = model weights/coefficients
+    \item $\lambda$ = regularization parameter
+    \item MSE = Mean Squared Error
+\end{itemize}
+
+\textbf{2. More Training Data}
+\begin{itemize}
+    \item More data = better generalization
+    \item Data augmentation if collection is expensive
+\end{itemize}
+
+\textbf{3. Reduce Model Complexity}
+\begin{itemize}
+    \item Fewer features (feature selection)
+    \item Shallower decision trees
+    \item Fewer layers/neurons in neural networks
+\end{itemize}
+
+\textbf{4. Early Stopping}
+\begin{itemize}
+    \item Monitor validation error during training
+    \item Stop when validation error starts increasing
+\end{itemize}
+
+\textbf{5. Dropout (Neural Networks)}
+\begin{itemize}
+    \item Randomly drop neurons during training
+    \item Forces network to learn robust features
+\end{itemize}
+
+\textbf{6. Ensemble Methods}
+\begin{itemize}
+    \item Bagging, Random Forests, Boosting
+    \item Reduces variance through averaging
+\end{itemize}
+
+\section{Bias-Variance Tradeoff}
+
+\subsection{The Fundamental Equation}
+\begin{equation}
+\text{Total Error} = \text{Bias}^2 + \text{Variance} + \text{Irreducible Error}
+\end{equation}
+
+\subsection{Bias}
+\textbf{What it is:} Error from incorrect assumptions in the model.
+
+\begin{itemize}
+    \item \textbf{High Bias} = Underfitting
+    \item Model too simple to capture patterns
+    \item Consistent errors across different datasets
+    \item Example: Linear model for nonlinear data
+\end{itemize}
+
+\textbf{Reducing Bias:}
+\begin{itemize}
+    \item Use more complex models
+    \item Add more features
+    \item Remove regularization
+\end{itemize}
+
+\subsection{Variance}
+\textbf{What it is:} Error from sensitivity to training data fluctuations.
+
+\begin{itemize}
+    \item \textbf{High Variance} = Overfitting
+    \item Model too flexible, captures noise
+    \item Large changes when trained on different datasets
+    \item Example: Deep decision tree
+\end{itemize}
+
+\textbf{Reducing Variance:}
+\begin{itemize}
+    \item Simplify model
+    \item Regularization
+    \item More training data
+    \item Ensemble methods
+\end{itemize}
+
+\subsection{The Tradeoff Visualized}
+
+\begin{forest}
+  for tree={
+    grow'=0,
+    child anchor=west,
+    parent anchor=south,
+    anchor=west,
+    calign=first,
+    edge path={
+      \noexpand\path [draw, \forestoption{edge}]
+      (!u.south west) +(7.5pt,0) |- node[fill,inner sep=1.25pt] {} (.child anchor)\forestoption{edge label};
+    },
+    before typesetting nodes={
+      if n=1
+        {insert before={[,phantom]}}
+        {}
+    },
+    fit=band,
+    before computing xy={l=15pt},
+  }
+[Model Complexity Spectrum
+  [Simple Models
+    [High Bias]
+    [Low Variance]
+    [Underfitting]
+  ]
+  [Optimal Complexity
+    [Balanced Bias \& Variance]
+    [Minimum Total Error]
+  ]
+  [Complex Models
+    [Low Bias]
+    [High Variance]
+    [Overfitting]
+  ]
+]
+\end{forest}
+
+\textbf{Sweet Spot:} Balance where total error is minimized
+
+\subsection{Practical Guidelines}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Symptom} & \textbf{Problem} & \textbf{Solution} \\ \midrule
+High train error, high test error & High Bias & Increase complexity \\
+Low train error, high test error & High Variance & Decrease complexity \\
+Both errors decreasing & Good! & Continue \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Mathematical Derivation (Brief)}
+
+For a prediction $\hat{y}$ and true value $y$:
+\begin{equation}
+E[(y - \hat{y})^2] = \underbrace{(E[\hat{y}] - y)^2}_{\text{Bias}^2} + \underbrace{E[(\hat{y} - E[\hat{y}])^2]}_{\text{Variance}} + \underbrace{\sigma^2}_{\text{Noise}}
+\end{equation}
+
+Where:
+\begin{itemize}
+    \item $\hat{y}$ = predicted value
+    \item $y$ = true value
+    \item $E[\cdot]$ = expected value
+    \item $\sigma^2$ = irreducible error (noise in data)
+\end{itemize}
+
+\textbf{Key Insight:} You can't simultaneously minimize both bias and variance. Reducing one typically increases the other. The goal is to find the optimal balance for your specific problem.
+
+\section{Quick Reference}
+
+\textbf{Correlation:} Standardized measure of linear relationship ($-1$ to $+1$)
+
+\textbf{Covariance:} Unstandardized measure of joint variability (units matter)
+
+\textbf{Overfitting:} Model memorizes training data, fails on new data
+
+\textbf{Underfitting:} Model too simple, misses patterns in training data
+
+\textbf{Bias:} Error from wrong assumptions (underfitting)
+
+\textbf{Variance:} Error from sensitivity to data (overfitting)
+
+\textbf{Goal:} Find model complexity that minimizes total error = Bias$^2$ + Variance + Noise
+
+\end{document}
